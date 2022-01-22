@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import "./css/Collections.css";
+// import "./css/Collections.css";
 
 const users = [
   {
