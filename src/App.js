@@ -1,51 +1,79 @@
-import React from 'react';
-import './style.css';
+import React, { PureComponent } from "react";
+import "./css/Collections.css";
 
 const users = [
   {
-    name: 'Alex',
-    email: 'Alex@sberbank.ru',
+    name: "Alex",
+    email: "alex@sb.ru",
   },
   {
-    name: 'Yan',
-    email: 'Yan@sberbank.ru',
+    name: "Yan",
+    email: "yan@sb.ru",
   },
   {
-    name: 'Max',
-    email: 'Max@sberbank.ru',
+    name: "Max",
+    email: "max@sb.ru",
   },
 ];
 
-// const Exapmle1 = () => (
-// <div>Hello, world!</div>
-// );
+const HeaderSimple = ({ text }) => <h1>{text}</h1>;
 
-// const Exapmle2 = () => <div>{"Hello, world!"}</div>;
-
-// const helloWorld = 'Hello, world!';
-// const Exapmle3 = () => {
-//   return <div>{helloWorld}</div>;
-// };
-
-const Userlist = ({ users }) => (
+//===Recursive!===
+const User = ({ user }) => (
   <ul>
-    {users.map(({ name, email, index }) => (
-      <>
-        <li key={index}>
-          {' '}
-          {name} {'<'}
-          {email}
-          {'>'};
-        </li>
-      </>
+    {Object.entries(user).map((subEl, k) => (
+      <li key={k}>
+        <b>{subEl[0]}</b> :
+        {typeof subEl[1] === "object" ? <User user={subEl[1]} /> : subEl[1]}
+      </li>
     ))}
   </ul>
 );
 
-export default function App() {
-  return (
-    <>
-      <Userlist users={users} />
-    </>
-  );
+//JSON.stringify(subEl[1])
+const UserItem = (props) => (
+  <li className="outerLi">{<User user={props.user} />}</li>
+);
+
+const alex = {
+  name: "Alex",
+  email: "alex@sb.ru",
+};
+
+const UserList = (props) => (
+  <ul>
+    {<UserItem user={alex} />}
+    {props.users?.map((el, i) => (
+      <UserItem user={el} key={i} />
+    ))}
+  </ul>
+);
+
+export default class Collection extends PureComponent {
+  state = { users: [{ ...alex }] };
+
+  constructor(props) {
+    super(props);
+    //this.state ={users: props.users}
+  }
+  //   static getDerivedStateFromProps({ users }) {
+  //     return { users };
+  //   }
+
+  componentDidMount() {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((users) => {
+        console.log(users);
+        this.setState((prevState) => ({ users }));
+      });
+  }
+  render() {
+    return (
+      <>
+        <HeaderSimple text="Users:" />
+        <UserList users={this.state.users} />
+      </>
+    );
+  }
 }
